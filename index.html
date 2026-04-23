@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Abuni - Application de gestion de stock et clients professionnelle">
+  <title>Abuni - Gestion Stock & Clients</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginPage" class="login-page">
+    <div class="login-box">
+      <div class="logo"><h1>⬡ Abuni</h1><p>Gestion de Stock & Clients</p></div>
+      <div id="loginError" class="login-error"></div>
+      <form id="loginForm">
+        <div class="form-group"><label for="loginUser">Nom d'utilisateur</label><input type="text" id="loginUser" class="form-control" placeholder="admin" required></div>
+        <div class="form-group"><label for="loginPass">Mot de passe</label><input type="password" id="loginPass" class="form-control" placeholder="••••••••" required></div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;margin-top:8px;">Se connecter</button>
+      </form>
+      <p style="text-align:center;margin-top:20px;font-size:0.78rem;color:var(--text-muted);">Défaut : admin / admin123</p>
+    </div>
+  </div>
+
+  <!-- ===== APP ===== -->
+  <div id="appLayout" class="app-layout hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo"><h1>⬡ Abuni</h1><span>Gestion Pro v1.0</span></div>
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-page="dashboard" id="navDashboard"><span class="icon">📊</span> Tableau de bord</a>
+        <a class="nav-item" data-page="produits" id="navProduits"><span class="icon">📦</span> Produits</a>
+        <a class="nav-item" data-page="clients" id="navClients"><span class="icon">👤</span> Clients</a>
+        <a class="nav-item" data-page="transactions" id="navTransactions"><span class="icon">🔁</span> Transactions</a>
+        <a class="nav-item" data-page="rapports" id="navRapports"><span class="icon">📈</span> Rapports</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div class="user-details"><div class="name" id="userName">Admin</div><div class="role" id="userRole">Administrateur</div></div>
+          <button class="btn-logout" id="btnLogout" title="Déconnexion">⏻</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- DASHBOARD -->
+      <section id="pageDashboard" class="page-section">
+        <div class="page-header"><div><button class="mobile-toggle" id="mobileToggle">☰</button><h2>Tableau de bord</h2><p>Vue d'ensemble de votre activité</p></div></div>
+        <div class="page-body">
+          <div class="stats-grid" id="dashStats"></div>
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><h3>📈 Activité (7 jours)</h3></div>
+              <div class="card-body">
+                <div class="chart-container" id="dashChart"></div>
+                <div style="display:flex;gap:20px;justify-content:center;margin-top:12px;">
+                  <span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted)"><span style="width:10px;height:10px;background:var(--success);border-radius:2px;display:inline-block"></span> Entrées</span>
+                  <span style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text-muted)"><span style="width:10px;height:10px;background:var(--accent);border-radius:2px;display:inline-block"></span> Sorties</span>
+                </div>
+              </div>
+            </div>
+            <div class="card"><div class="card-header"><h3>⚠️ Alertes stock</h3></div><div class="card-body" id="dashAlertes"></div></div>
+          </div>
+          <div class="card" style="margin-top:20px">
+            <div class="card-header"><h3>🕐 Transactions récentes</h3></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Type</th><th>Produit</th><th>Client</th><th>Qté</th><th>Montant</th><th>Date</th></tr></thead><tbody id="dashRecentes"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRODUITS -->
+      <section id="pageProduits" class="page-section hidden">
+        <div class="page-header"><div><h2>Produits</h2><p>Gérez votre catalogue</p></div><button class="btn btn-primary" id="btnAddProduit">+ Ajouter</button></div>
+        <div class="page-body">
+          <div class="toolbar"><div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="searchProduits" placeholder="Rechercher un produit..."></div></div>
+          <div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="produitsTable"></tbody></table></div></div>
+        </div>
+      </section>
+
+      <!-- CLIENTS -->
+      <section id="pageClients" class="page-section hidden">
+        <div class="page-header"><div><h2>Clients</h2><p>Gérez votre base clients</p></div><button class="btn btn-primary" id="btnAddClient">+ Ajouter</button></div>
+        <div class="page-body">
+          <div class="toolbar"><div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="searchClients" placeholder="Rechercher un client..."></div></div>
+          <div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Entreprise</th><th>Actions</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section id="pageTransactions" class="page-section hidden">
+        <div class="page-header"><div><h2>Transactions</h2><p>Entrées et sorties de stock</p></div><button class="btn btn-primary" id="btnAddTransaction">+ Nouvelle</button></div>
+        <div class="page-body"><div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Type</th><th>Produit</th><th>Client</th><th>Qté</th><th>Montant</th><th>Date</th></tr></thead><tbody id="transactionsTable"></tbody></table></div></div></div>
+      </section>
+
+      <!-- RAPPORTS -->
+      <section id="pageRapports" class="page-section hidden">
+        <div class="page-header"><div><h2>Rapports</h2><p>Statistiques et analyses</p></div></div>
+        <div class="page-body">
+          <div class="stats-grid" id="rapportStats"></div>
+          <div class="card"><div class="card-header"><h3>📊 Historique complet</h3></div>
+            <div class="table-container"><table class="data-table"><thead><tr><th>Type</th><th>Produit</th><th>Client</th><th>Qté</th><th>P.U.</th><th>Total</th><th>Date</th></tr></thead><tbody id="rapportTable"></tbody></table></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modalProduit"><div class="modal"><div class="modal-header"><h3 id="modalProduitTitle">Ajouter un produit</h3><button class="btn-icon" onclick="closeModal('modalProduit')">✕</button></div><div class="modal-body"><form id="formProduit"><input type="hidden" id="produitId"><div class="form-group"><label>Nom *</label><input type="text" id="produitNom" class="form-control" placeholder="Ex: Ciment CPA" required></div><div class="form-row"><div class="form-group"><label>Catégorie</label><input type="text" id="produitCategorie" class="form-control" placeholder="Ex: Construction"></div><div class="form-group"><label>Prix (FCFA)</label><input type="number" id="produitPrix" class="form-control" placeholder="0" min="0"></div></div><div class="form-row"><div class="form-group"><label>Quantité</label><input type="number" id="produitQuantite" class="form-control" placeholder="0" min="0"></div><div class="form-group"><label>Seuil alerte</label><input type="number" id="produitSeuil" class="form-control" placeholder="5" min="0"></div></div><div class="form-group"><label>Description</label><textarea id="produitDesc" class="form-control" rows="2"></textarea></div></form></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalProduit')">Annuler</button><button class="btn btn-primary" id="btnSaveProduit">Enregistrer</button></div></div></div>
+
+  <div class="modal-overlay" id="modalClient"><div class="modal"><div class="modal-header"><h3 id="modalClientTitle">Ajouter un client</h3><button class="btn-icon" onclick="closeModal('modalClient')">✕</button></div><div class="modal-body"><form id="formClient"><input type="hidden" id="clientId"><div class="form-group"><label>Nom complet *</label><input type="text" id="clientNom" class="form-control" placeholder="Ex: Jean Dupont" required></div><div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="clientEmail" class="form-control" placeholder="email@exemple.com"></div><div class="form-group"><label>Téléphone</label><input type="text" id="clientTel" class="form-control" placeholder="+241 XX XX XX"></div></div><div class="form-row"><div class="form-group"><label>Entreprise</label><input type="text" id="clientEntreprise" class="form-control"></div><div class="form-group"><label>Adresse</label><input type="text" id="clientAdresse" class="form-control"></div></div><div class="form-group"><label>Notes</label><textarea id="clientNotes" class="form-control" rows="2"></textarea></div></form></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalClient')">Annuler</button><button class="btn btn-primary" id="btnSaveClient">Enregistrer</button></div></div></div>
+
+  <div class="modal-overlay" id="modalTransaction"><div class="modal"><div class="modal-header"><h3>Nouvelle transaction</h3><button class="btn-icon" onclick="closeModal('modalTransaction')">✕</button></div><div class="modal-body"><form id="formTransaction"><div class="form-group"><label>Type</label><select id="transType" class="form-control"><option value="entree">📥 Entrée de stock</option><option value="sortie">📤 Sortie (vente)</option></select></div><div class="form-group"><label>Produit *</label><select id="transProduit" class="form-control" required></select></div><div class="form-group"><label>Client</label><select id="transClient" class="form-control"><option value="">-- Aucun --</option></select></div><div class="form-group"><label>Quantité *</label><input type="number" id="transQuantite" class="form-control" placeholder="1" min="1" required></div><div class="form-group"><label>Note</label><input type="text" id="transNote" class="form-control" placeholder="Optionnel"></div></form></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalTransaction')">Annuler</button><button class="btn btn-primary" id="btnSaveTransaction">Valider</button></div></div></div>
+
+  <div class="modal-overlay" id="modalConfirm"><div class="modal" style="width:400px"><div class="modal-header"><h3>Confirmer</h3><button class="btn-icon" onclick="closeModal('modalConfirm')">✕</button></div><div class="modal-body"><p id="confirmMessage">Êtes-vous sûr ?</p></div><div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modalConfirm')">Annuler</button><button class="btn btn-danger" id="btnConfirmAction" style="background:var(--danger);color:#fff;border:none">Supprimer</button></div></div></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
