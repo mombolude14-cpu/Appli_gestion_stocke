@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Abuni - Application de gestion de stock et clients professionnelle">
   <title>Abuni - Gestion Stock & Clients</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Abuni">
 </head>
 <body>
   <div class="toast-container" id="toastContainer"></div>
@@ -71,6 +78,16 @@
         </div>
       </div>
     </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <nav class="bottom-nav">
+      <a class="bottom-nav-item active" data-page="dashboard"><span class="icon">📊</span><span>Stats</span></a>
+      <a class="bottom-nav-item" data-page="produits"><span class="icon">📦</span><span>Stock</span></a>
+      <a class="bottom-nav-item" data-page="transactions"><span class="icon">🔁</span><span>Trans.</span></a>
+      <a class="bottom-nav-item" data-page="clients"><span class="icon">👤</span><span>Clients</span></a>
+      <a class="bottom-nav-item" data-page="rapports"><span class="icon">📈</span><span>Plus</span></a>
+    </nav>
 
     <!-- MAIN -->
     <main class="main-content">
@@ -355,6 +372,6 @@
     </div>
   </div>
 
-  <script src="/js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

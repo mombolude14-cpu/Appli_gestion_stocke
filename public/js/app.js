@@ -82,30 +82,47 @@ async function checkSession() {
 
 // ===== NAVIGATION =====
 const navItems = document.querySelectorAll('.nav-item');
-const pages = document.querySelectorAll('.page-section');
+const bottomNavItems = document.querySelectorAll('.bottom-nav-item');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-navItems.forEach(item => {
-  item.addEventListener('click', () => {
-    const page = item.dataset.page;
-    navItems.forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-    pages.forEach(p => p.classList.add('hidden'));
-    document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1)).classList.remove('hidden');
-    // Fermer sidebar mobile
-    document.getElementById('sidebar').classList.remove('open');
-    // Charger données
-    if (page === 'dashboard') loadDashboard();
-    else if (page === 'produits') loadProduits();
-    else if (page === 'clients') loadClients();
-    else if (page === 'transactions') loadTransactions();
-    else if (page === 'rapports') loadRapports();
-  });
-});
+function navigateTo(page) {
+  navItems.forEach(n => n.classList.remove('active'));
+  bottomNavItems.forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden'));
 
-// Mobile toggle
-document.getElementById('mobileToggle').addEventListener('click', () => {
-  document.getElementById('sidebar').classList.toggle('open');
-});
+  const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+  const bottomNavEl = document.querySelector(`.bottom-nav-item[data-page="${page}"]`);
+
+  if (navEl) navEl.classList.add('active');
+  if (bottomNavEl) bottomNavEl.classList.add('active');
+
+  const pageEl = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
+  if (pageEl) pageEl.classList.remove('hidden');
+
+  closeSidebar();
+
+  if (page === 'dashboard') loadDashboard();
+  else if (page === 'produits') loadProduits();
+  else if (page === 'clients') loadClients();
+  else if (page === 'transactions') loadTransactions();
+  else if (page === 'rapports') loadRapports();
+}
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('active');
+}
+
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('active');
+}
+
+navItems.forEach(item => item.addEventListener('click', () => navigateTo(item.dataset.page)));
+bottomNavItems.forEach(item => item.addEventListener('click', () => navigateTo(item.dataset.page)));
+document.getElementById('mobileToggle').addEventListener('click', openSidebar);
+sidebarOverlay.addEventListener('click', closeSidebar);
 
 // ===== DASHBOARD =====
 async function loadDashboard() {
@@ -131,7 +148,7 @@ async function loadDashboard() {
       document.getElementById('dashRecentes').innerHTML = '<tr><td colspan="6"><div class="empty-state"><p>Aucune transaction</p></div></td></tr>';
     } else {
       document.getElementById('dashRecentes').innerHTML = data.recentes.map(t => `
-        <tr><td><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td><td>${t.produit_nom || '-'}</td><td>${t.client_nom || '-'}</td><td>${t.quantite}</td><td>${fmtMoney(t.montant_total)}</td><td>${fmtDate(t.date)}</td></tr>
+        <tr><td data-label="Type"><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td><td data-label="Produit">${t.produit_nom || '-'}</td><td data-label="Client">${t.client_nom || '-'}</td><td data-label="Qté">${t.quantite}</td><td data-label="Montant">${fmtMoney(t.montant_total)}</td><td data-label="Date">${fmtDate(t.date)}</td></tr>
       `).join('');
     }
     // Chart
@@ -170,8 +187,8 @@ async function loadProduits(search = '') {
       else if (p.quantite <= p.seuil_alerte) { statut = 'Alerte'; badge = 'warning'; }
       else { statut = 'En stock'; badge = 'success'; }
       return `<tr>
-        <td><strong>${p.nom}</strong></td><td>${p.categorie}</td><td>${fmtMoney(p.prix)}</td><td>${p.quantite}</td>
-        <td><span class="badge badge-${badge}">${statut}</span></td>
+        <td data-label="Nom"><strong>${p.nom}</strong></td><td data-label="Catégorie">${p.categorie}</td><td data-label="Prix">${fmtMoney(p.prix)}</td><td data-label="Stock">${p.quantite}</td>
+        <td data-label="Statut"><span class="badge badge-${badge}">${statut}</span></td>
         <td class="actions">
           <button class="btn btn-ghost btn-sm" onclick="editProduit(${p.id})">✏️</button>
           <button class="btn btn-danger btn-sm" onclick="deleteProduit(${p.id},'${p.nom.replace(/'/g, "\\'")}')">🗑</button>
@@ -254,7 +271,7 @@ async function loadClients(search = '') {
     }
     document.getElementById('clientsTable').innerHTML = clients.map(c => `
       <tr>
-        <td><strong>${c.nom}</strong></td><td>${c.email || '-'}</td><td>${c.telephone || '-'}</td><td>${c.entreprise || '-'}</td>
+        <td data-label="Nom"><strong>${c.nom}</strong></td><td data-label="Email">${c.email || '-'}</td><td data-label="Téléphone">${c.telephone || '-'}</td><td data-label="Entreprise">${c.entreprise || '-'}</td>
         <td class="actions">
           <button class="btn btn-ghost btn-sm" onclick="editClient(${c.id})">✏️</button>
           <button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id},'${c.nom.replace(/'/g, "\\'")}')">🗑</button>
@@ -336,9 +353,9 @@ async function loadTransactions() {
     }
     document.getElementById('transactionsTable').innerHTML = transactions.map(t => `
       <tr>
-        <td><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td>
-        <td>${t.produit_nom || '-'}</td><td>${t.client_nom || '-'}</td><td>${t.quantite}</td>
-        <td>${fmtMoney(t.montant_total)}</td><td>${fmtDate(t.date)}</td>
+        <td data-label="Type"><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td>
+        <td data-label="Produit">${t.produit_nom || '-'}</td><td data-label="Client">${t.client_nom || '-'}</td><td data-label="Qté">${t.quantite}</td>
+        <td data-label="Montant">${fmtMoney(t.montant_total)}</td><td data-label="Date">${fmtDate(t.date)}</td>
       </tr>
     `).join('');
   } catch (err) { toast(err.message, 'error'); }
@@ -390,9 +407,9 @@ async function loadRapports() {
     } else {
       document.getElementById('rapportTable').innerHTML = transactions.map(t => `
         <tr>
-          <td><span class="badge badge-${t.type}">${t.type === 'entree' ? 'Entrée' : 'Sortie'}</span></td>
-          <td>${t.produit_nom || '-'}</td><td>${t.client_nom || '-'}</td><td>${t.quantite}</td>
-          <td>${fmtMoney(t.prix_unitaire)}</td><td>${fmtMoney(t.montant_total)}</td><td>${fmtDate(t.date)}</td>
+          <td data-label="Type"><span class="badge badge-${t.type}">${t.type === 'entree' ? 'Entrée' : 'Sortie'}</span></td>
+          <td data-label="Produit">${t.produit_nom || '-'}</td><td data-label="Client">${t.client_nom || '-'}</td><td data-label="Qté">${t.quantite}</td>
+          <td data-label="P.U.">${fmtMoney(t.prix_unitaire)}</td><td data-label="Total">${fmtMoney(t.montant_total)}</td><td data-label="Date">${fmtDate(t.date)}</td>
         </tr>
       `).join('');
     }

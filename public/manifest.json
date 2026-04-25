@@ -1,0 +1,17 @@
+{
+  "name": "Abuni Gestion Pro",
+  "short_name": "Abuni",
+  "description": "Application professionnelle de gestion de stock et clients",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0a0e17",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2897/2897785.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

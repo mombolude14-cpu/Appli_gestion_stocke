@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0a0e17">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Abuni">
 </head>
 <body>
   <div class="toast-container" id="toastContainer"></div>
@@ -46,6 +51,16 @@
       </div>
     </aside>
 
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <nav class="bottom-nav">
+      <a class="bottom-nav-item active" data-page="dashboard"><span class="icon">📊</span><span>Stats</span></a>
+      <a class="bottom-nav-item" data-page="produits"><span class="icon">📦</span><span>Stock</span></a>
+      <a class="bottom-nav-item" data-page="transactions"><span class="icon">🔁</span><span>Trans.</span></a>
+      <a class="bottom-nav-item" data-page="clients"><span class="icon">👤</span><span>Clients</span></a>
+      <a class="bottom-nav-item" data-page="rapports"><span class="icon">📈</span><span>Plus</span></a>
+    </nav>
+
     <main class="main-content">
       <!-- DASHBOARD -->
       <section id="pageDashboard" class="page-section">
@@ -74,7 +89,7 @@
 
       <!-- PRODUITS -->
       <section id="pageProduits" class="page-section hidden">
-        <div class="page-header"><div><h2>Produits</h2><p>Gérez votre catalogue</p></div><button class="btn btn-primary" id="btnAddProduit">+ Ajouter</button></div>
+        <div class="page-header"><div><button class="mobile-toggle">☰</button><h2>Produits</h2><p>Gérez votre catalogue</p></div><button class="btn btn-primary" id="btnAddProduit">+ Ajouter</button></div>
         <div class="page-body">
           <div class="toolbar"><div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="searchProduits" placeholder="Rechercher un produit..."></div></div>
           <div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="produitsTable"></tbody></table></div></div>
@@ -83,7 +98,7 @@
 
       <!-- CLIENTS -->
       <section id="pageClients" class="page-section hidden">
-        <div class="page-header"><div><h2>Clients</h2><p>Gérez votre base clients</p></div><button class="btn btn-primary" id="btnAddClient">+ Ajouter</button></div>
+        <div class="page-header"><div><button class="mobile-toggle">☰</button><h2>Clients</h2><p>Gérez votre base clients</p></div><button class="btn btn-primary" id="btnAddClient">+ Ajouter</button></div>
         <div class="page-body">
           <div class="toolbar"><div class="search-bar"><span class="search-icon">🔍</span><input type="text" id="searchClients" placeholder="Rechercher un client..."></div></div>
           <div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Entreprise</th><th>Actions</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
@@ -92,13 +107,13 @@
 
       <!-- TRANSACTIONS -->
       <section id="pageTransactions" class="page-section hidden">
-        <div class="page-header"><div><h2>Transactions</h2><p>Entrées et sorties de stock</p></div><button class="btn btn-primary" id="btnAddTransaction">+ Nouvelle</button></div>
+        <div class="page-header"><div><button class="mobile-toggle">☰</button><h2>Transactions</h2><p>Entrées et sorties de stock</p></div><button class="btn btn-primary" id="btnAddTransaction">+ Nouvelle</button></div>
         <div class="page-body"><div class="card"><div class="table-container"><table class="data-table"><thead><tr><th>Type</th><th>Produit</th><th>Client</th><th>Qté</th><th>Montant</th><th>Date</th></tr></thead><tbody id="transactionsTable"></tbody></table></div></div></div>
       </section>
 
       <!-- RAPPORTS -->
       <section id="pageRapports" class="page-section hidden">
-        <div class="page-header"><div><h2>Rapports</h2><p>Statistiques et analyses</p></div></div>
+        <div class="page-header"><div><button class="mobile-toggle">☰</button><h2>Rapports</h2><p>Statistiques et analyses</p></div></div>
         <div class="page-body">
           <div class="stats-grid" id="rapportStats"></div>
           <div class="card"><div class="card-header"><h3>📊 Historique complet</h3></div>

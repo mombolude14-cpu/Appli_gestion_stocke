@@ -1,7 +1,7 @@
 /**
- * Abuni - Application de Gestion Stock & Clients
- * Version 100% Frontend avec LocalStorage
- */
+* Abuni - Application de Gestion Stock & Clients
+* Version 100% Frontend avec LocalStorage
+*/
 
 // ===== STORE =====
 const Store = {
@@ -76,13 +76,23 @@ function checkSession() {
 const navItems = document.querySelectorAll('.nav-item');
 
 function navigateTo(page) {
-  navItems.forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden'));
+  // Update sidebar nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
   if (navEl) navEl.classList.add('active');
+
+  // Update bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
+  const bottomNavEl = document.querySelector(`.bottom-nav-item[data-page="${page}"]`);
+  if (bottomNavEl) bottomNavEl.classList.add('active');
+
+  // Switch pages
+  document.querySelectorAll('.page-section').forEach(p => p.classList.add('hidden'));
   const pageEl = document.getElementById('page' + page.charAt(0).toUpperCase() + page.slice(1));
   if (pageEl) pageEl.classList.remove('hidden');
+
   document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
   if (page === 'dashboard') loadDashboard();
   else if (page === 'produits') loadProduits();
   else if (page === 'clients') loadClients();
@@ -90,8 +100,29 @@ function navigateTo(page) {
   else if (page === 'rapports') loadRapports();
 }
 
-navItems.forEach(item => item.addEventListener('click', () => navigateTo(item.dataset.page)));
-document.getElementById('mobileToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+// Sidebar items
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => navigateTo(item.dataset.page));
+});
+
+// Bottom nav items
+document.querySelectorAll('.bottom-nav-item').forEach(item => {
+  item.addEventListener('click', () => navigateTo(item.dataset.page));
+});
+
+// Mobile toggle (all buttons)
+document.querySelectorAll('.mobile-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+  });
+});
+
+// Close sidebar when clicking overlay
+document.getElementById('sidebarOverlay').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+});
 
 // ===== PRODUITS CRUD =====
 function getProduits() { return Store.get('abuni_produits'); }
@@ -107,7 +138,7 @@ function loadProduits(search) {
     if (p.quantite === 0) { statut = 'Rupture'; badge = 'danger'; }
     else if (p.quantite <= (p.seuil || 5)) { statut = 'Alerte'; badge = 'warning'; }
     else { statut = 'En stock'; badge = 'success'; }
-    return `<tr><td><strong>${p.nom}</strong></td><td>${p.categorie || 'Général'}</td><td>${fmtMoney(p.prix)}</td><td>${p.quantite}</td><td><span class="badge badge-${badge}">${statut}</span></td><td class="actions"><button class="btn btn-ghost btn-sm" onclick="editProduit('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteProduit('${p.id}','${escapeHtml(p.nom)}')">🗑</button></td></tr>`;
+    return `<tr><td data-label="Produit"><strong>${p.nom}</strong></td><td data-label="Catégorie">${p.categorie || 'Général'}</td><td data-label="Prix">${fmtMoney(p.prix)}</td><td data-label="Stock">${p.quantite}</td><td data-label="Statut"><span class="badge badge-${badge}">${statut}</span></td><td class="actions"><button class="btn btn-ghost btn-sm" onclick="editProduit('${p.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteProduit('${p.id}','${escapeHtml(p.nom)}')">🗑</button></td></tr>`;
   }).join('');
 }
 
@@ -174,7 +205,7 @@ function loadClients(search) {
   if (search) { const q = search.toLowerCase(); clients = clients.filter(c => c.nom.toLowerCase().includes(q) || (c.email || '').toLowerCase().includes(q) || (c.telephone || '').includes(q)); }
   const tbody = document.getElementById('clientsTable');
   if (!clients.length) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="icon">👤</div><p>Aucun client</p></div></td></tr>'; return; }
-  tbody.innerHTML = clients.map(c => `<tr><td><strong>${c.nom}</strong></td><td>${c.email || '-'}</td><td>${c.telephone || '-'}</td><td>${c.entreprise || '-'}</td><td class="actions"><button class="btn btn-ghost btn-sm" onclick="editClient('${c.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}','${escapeHtml(c.nom)}')">🗑</button></td></tr>`).join('');
+  tbody.innerHTML = clients.map(c => `<tr><td data-label="Nom"><strong>${c.nom}</strong></td><td data-label="Email">${c.email || '-'}</td><td data-label="Téléphone">${c.telephone || '-'}</td><td data-label="Entreprise">${c.entreprise || '-'}</td><td class="actions"><button class="btn btn-ghost btn-sm" onclick="editClient('${c.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}','${escapeHtml(c.nom)}')">🗑</button></td></tr>`).join('');
 }
 
 let searchCTimer;
@@ -236,7 +267,7 @@ function getTransactions() { return Store.get('abuni_transactions'); }
 function saveTransactions(data) { Store.set('abuni_transactions', data); }
 
 function renderTransRow(t) {
-  return `<tr><td><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td><td>${t.produitNom || '-'}</td><td>${t.clientNom || '-'}</td><td>${t.quantite}</td><td>${fmtMoney(t.montant)}</td><td>${fmtDate(t.date)}</td></tr>`;
+  return `<tr><td data-label="Type"><span class="badge badge-${t.type}">${t.type === 'entree' ? '📥 Entrée' : '📤 Sortie'}</span></td><td data-label="Produit">${t.produitNom || '-'}</td><td data-label="Client">${t.clientNom || '-'}</td><td data-label="Qté">${t.quantite}</td><td data-label="Montant">${fmtMoney(t.montant)}</td><td data-label="Date">${fmtDate(t.date)}</td></tr>`;
 }
 
 function loadTransactions() {
@@ -355,7 +386,7 @@ function loadRapports() {
 
   document.getElementById('rapportTable').innerHTML = trans.length === 0
     ? '<tr><td colspan="7"><div class="empty-state"><p>Aucune donnée</p></div></td></tr>'
-    : trans.map(t => `<tr><td><span class="badge badge-${t.type}">${t.type === 'entree' ? 'Entrée' : 'Sortie'}</span></td><td>${t.produitNom || '-'}</td><td>${t.clientNom || '-'}</td><td>${t.quantite}</td><td>${fmtMoney(t.prixUnit)}</td><td>${fmtMoney(t.montant)}</td><td>${fmtDate(t.date)}</td></tr>`).join('');
+    : trans.map(t => `<tr><td data-label="Type"><span class="badge badge-${t.type}">${t.type === 'entree' ? 'Entrée' : 'Sortie'}</span></td><td data-label="Produit">${t.produitNom || '-'}</td><td data-label="Client">${t.clientNom || '-'}</td><td data-label="Qté">${t.quantite}</td><td data-label="P.U.">${fmtMoney(t.prixUnit)}</td><td data-label="Total">${fmtMoney(t.montant)}</td><td data-label="Date">${fmtDate(t.date)}</td></tr>`).join('');
 }
 
 // ===== INIT =====
